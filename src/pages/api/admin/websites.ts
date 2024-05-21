@@ -10,7 +10,7 @@ import * as yup from 'yup';
 
 export interface WebsitesRequestQuery extends PageParams {
   userId?: string;
-  includeTeams?: boolean;
+  includeOwnedTeams?: boolean;
 }
 
 export interface WebsitesRequestBody {
@@ -50,20 +50,21 @@ export default async (
         where: {
           OR: [
             ...(userId && [{ userId }]),
-            ...(userId &&
-              includeOwnedTeams && [
-                {
-                  team: {
-                    deletedAt: null,
-                    teamUser: {
-                      some: {
-                        role: ROLES.teamOwner,
-                        userId,
+            ...(userId && includeOwnedTeams
+              ? [
+                  {
+                    team: {
+                      deletedAt: null,
+                      teamUser: {
+                        some: {
+                          role: ROLES.teamOwner,
+                          userId,
+                        },
                       },
                     },
                   },
-                },
-              ]),
+                ]
+              : []),
           ],
         },
         include: {

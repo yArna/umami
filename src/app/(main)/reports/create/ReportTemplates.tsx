@@ -5,6 +5,8 @@ import Funnel from 'assets/funnel.svg';
 import Lightbulb from 'assets/lightbulb.svg';
 import Magnet from 'assets/magnet.svg';
 import Tag from 'assets/tag.svg';
+import Target from 'assets/target.svg';
+import Path from 'assets/path.svg';
 import styles from './ReportTemplates.module.css';
 import { useMessages, useTeamUrl } from 'components/hooks';
 
@@ -36,6 +38,18 @@ export function ReportTemplates({ showHeader = true }: { showHeader?: boolean })
       description: formatMessage(labels.utmDescription),
       url: renderTeamUrl('/reports/utm'),
       icon: <Tag />,
+    },
+    {
+      title: formatMessage(labels.goals),
+      description: formatMessage(labels.goalsDescription),
+      url: renderTeamUrl('/reports/goals'),
+      icon: <Target />,
+    },
+    {
+      title: formatMessage(labels.journey),
+      description: formatMessage(labels.journeyDescription),
+      url: renderTeamUrl('/reports/journey'),
+      icon: <Path />,
     },
   ];
 
