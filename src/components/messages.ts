@@ -88,6 +88,8 @@ export const labels = defineMessages({
   leaveTeam: { id: 'label.leave-team', defaultMessage: 'Leave team' },
   refresh: { id: 'label.refresh', defaultMessage: 'Refresh' },
   pages: { id: 'label.pages', defaultMessage: 'Pages' },
+  entry: { id: 'label.entry', defaultMessage: 'Entry URL' },
+  exit: { id: 'label.exit', defaultMessage: 'Exit URL' },
   referrers: { id: 'label.referrers', defaultMessage: 'Referrers' },
   screens: { id: 'label.screens', defaultMessage: 'Screens' },
   browsers: { id: 'label.browsers', defaultMessage: 'Browsers' },
@@ -134,7 +136,7 @@ export const labels = defineMessages({
   uniqueVisitors: { id: 'label.unique-visitors', defaultMessage: 'Unique visitors' },
   bounceRate: { id: 'label.bounce-rate', defaultMessage: 'Bounce rate' },
   viewsPerVisit: { id: 'label.views-per-visit', defaultMessage: 'Views per visit' },
-  averageVisitTime: { id: 'label.average-visit-time', defaultMessage: 'Average visit time' },
+  visitDuration: { id: 'label.visit-duration', defaultMessage: 'Visit duration' },
   desktop: { id: 'label.desktop', defaultMessage: 'Desktop' },
   laptop: { id: 'label.laptop', defaultMessage: 'Laptop' },
   tablet: { id: 'label.tablet', defaultMessage: 'Tablet' },
@@ -240,6 +242,8 @@ export const labels = defineMessages({
     defaultMessage: 'Track your campaigns through UTM parameters.',
   },
   steps: { id: 'label.steps', defaultMessage: 'Steps' },
+  startStep: { id: 'label.start-step', defaultMessage: 'Start Step' },
+  endStep: { id: 'label.end-step', defaultMessage: 'End Step' },
   addStep: { id: 'label.add-step', defaultMessage: 'Add step' },
   goal: { id: 'label.goal', defaultMessage: 'Goal' },
   goals: { id: 'label.goals', defaultMessage: 'Goals' },
@@ -252,6 +256,11 @@ export const labels = defineMessages({
     id: 'label.journey-description',
     defaultMessage: 'Understand how users nagivate through your website.',
   },
+  compare: { id: 'label.compare', defaultMessage: 'Compare' },
+  current: { id: 'label.current', defaultMessage: 'Current' },
+  previous: { id: 'label.previous', defaultMessage: 'Previous' },
+  previousPeriod: { id: 'label.previous-period', defaultMessage: 'Previous period' },
+  previousYear: { id: 'label.previous-year', defaultMessage: 'Previous year' },
 });
 
 export const messages = defineMessages({
