@@ -1,9 +1,9 @@
-import { useContext, useMemo, useState } from 'react';
-import { TooltipPopup } from 'react-basics';
-import { firstBy } from 'thenby';
 import classNames from 'classnames';
 import { useEscapeKey, useMessages } from 'components/hooks';
 import { objectToArray } from 'lib/data';
+import { useContext, useMemo, useState } from 'react';
+import { TooltipPopup } from 'react-basics';
+import { firstBy } from 'thenby';
 import { ReportContext } from '../[reportId]/Report';
 // eslint-disable-next-line css-modules/no-unused-class
 import styles from './JourneyView.module.css';
@@ -41,9 +41,7 @@ export default function JourneyView() {
           const active = selected && !!activePaths.find(path => path.items[columnIndex] === name);
 
           if (!nodes[name]) {
-            const paths = data.filter((d, i) => {
-              return i !== columnIndex && d.items[columnIndex] === name;
-            });
+            const paths = data.filter(d => d.items[columnIndex] === name);
 
             const from =
               columnIndex > 0 &&
