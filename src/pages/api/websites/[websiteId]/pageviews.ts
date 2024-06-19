@@ -18,6 +18,7 @@ export interface WebsitePageviewRequestQuery {
   url?: string;
   referrer?: string;
   title?: string;
+  host?: string;
   os?: string;
   browser?: string;
   device?: string;
@@ -37,6 +38,7 @@ const schema = {
     url: yup.string(),
     referrer: yup.string(),
     title: yup.string(),
+    host: yup.string(),
     os: yup.string(),
     browser: yup.string(),
     device: yup.string(),

@@ -17,6 +17,7 @@ export interface WebsiteStatsRequestQuery {
   title?: string;
   query?: string;
   event?: string;
+  host?: string;
   os?: string;
   browser?: string;
   device?: string;
@@ -36,6 +37,7 @@ const schema = {
     title: yup.string(),
     query: yup.string(),
     event: yup.string(),
+    host: yup.string(),
     os: yup.string(),
     browser: yup.string(),
     device: yup.string(),
