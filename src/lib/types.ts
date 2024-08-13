@@ -41,7 +41,7 @@ export interface PageResult<T> {
   sortDescending?: boolean;
 }
 
-export interface FilterQueryResult<T> {
+export interface PagedQueryResult<T> {
   result: PageResult<T>;
   query: any;
   params: PageParams;
@@ -125,9 +125,9 @@ export interface WebsiteEventMetric {
 
 export interface WebsiteEventData {
   eventName?: string;
-  fieldName: string;
+  propertyName: string;
   dataType: number;
-  fieldValue?: string;
+  propertyValue?: string;
   total: number;
 }
 

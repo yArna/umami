@@ -5,12 +5,12 @@ import prisma from 'lib/prisma';
 import { DynamicData } from 'lib/types';
 import { CLICKHOUSE, PRISMA, runQuery } from 'lib/db';
 import kafka from 'lib/kafka';
+import clickhouse from 'lib/clickhouse';
 
 export async function saveSessionData(data: {
   websiteId: string;
   sessionId: string;
   sessionData: DynamicData;
-  createdAt?: string;
 }) {
   return runQuery({
     [PRISMA]: () => relationalQuery(data),
@@ -77,11 +77,12 @@ async function clickhouseQuery(data: {
   websiteId: string;
   sessionId: string;
   sessionData: DynamicData;
-  createdAt?: string;
 }) {
-  const { websiteId, sessionId, sessionData, createdAt } = data;
+  const { websiteId, sessionId, sessionData } = data;
 
+  const { insert } = clickhouse;
   const { getDateFormat, sendMessages } = kafka;
+  const createdAt = getDateFormat(new Date());
 
   const jsonKeys = flattenJSON(sessionData);
 
@@ -98,7 +99,11 @@ async function clickhouseQuery(data: {
     };
   });
 
-  await sendMessages(messages, 'session_data');
+  if (kafka.enabled) {
+    await sendMessages('session_data', messages);
+  } else {
+    await insert('session_data', messages);
+  }
 
   return data;
 }
