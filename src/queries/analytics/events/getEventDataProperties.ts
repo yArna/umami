@@ -24,14 +24,16 @@ async function relationalQuery(
   return rawQuery(
     `
     select
-      data_key as "propertyName",
+      website_event.event_name as "eventName",
+      event_data.data_key as "propertyName",
       count(*) as "total"
-    from event_data
-    where website_id = {{websiteId::uuid}}
-      and created_at between {{startDate}} and {{endDate}}
+    from event_data 
+    join website_event on website_event.event_id = event_data.website_event_id
+    where event_data.website_id = {{websiteId::uuid}}
+      and event_data.created_at between {{startDate}} and {{endDate}}
     ${filterQuery}
-    group by data_key
-    order by 2 desc
+    group by website_event.event_name, event_data.data_key
+    order by 3 desc
     limit 500
     `,
     params,
@@ -41,7 +43,7 @@ async function relationalQuery(
 async function clickhouseQuery(
   websiteId: string,
   filters: QueryFilters & { propertyName?: string },
-): Promise<{ propertyName: string; dataType: number; propertyValue: string; total: number }[]> {
+): Promise<{ eventName: string; propertyName: string; total: number }[]> {
   const { rawQuery, parseFilters } = clickhouse;
   const { filterQuery, params } = await parseFilters(websiteId, filters, {
     columns: { propertyName: 'data_key' },
@@ -50,25 +52,17 @@ async function clickhouseQuery(
   return rawQuery(
     `
     select
+      event_name as eventName,
       data_key as propertyName,
       count(*) as total
     from event_data
     where website_id = {websiteId:UUID}
       and created_at between {startDate:DateTime64} and {endDate:DateTime64}
     ${filterQuery}
-    group by data_key
-    order by 2 desc
+    group by event_name, data_key
+    order by 1, 3 desc
     limit 500
     `,
     params,
-  ).then(result => {
-    return Object.values(result).map((a: any) => {
-      return {
-        propertyName: a.propertyName,
-        dataType: Number(a.dataType),
-        propertyValue: a.propertyValue,
-        total: Number(a.total),
-      };
-    });
-  });
+  );
 }

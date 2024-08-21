@@ -1,3 +1,4 @@
+import debug from 'debug';
 import { Prisma } from '@prisma/client';
 import prisma from '@umami/prisma-client';
 import moment from 'moment-timezone';
@@ -7,6 +8,8 @@ import { fetchWebsite } from './load';
 import { maxDate } from './date';
 import { QueryFilters, QueryOptions, PageParams } from './types';
 import { filtersToArray } from './params';
+
+const log = debug('umami:prisma');
 
 const MYSQL_DATE_FORMATS = {
   minute: '%Y-%m-%d %H:%i:00',
@@ -78,6 +81,18 @@ function getDateSQL(field: string, unit: string, timezone?: string): string {
     }
 
     return `date_format(${field}, '${MYSQL_DATE_FORMATS[unit]}')`;
+  }
+}
+
+function getDateWeeklySQL(field: string) {
+  const db = getDatabaseType();
+
+  if (db === POSTGRESQL) {
+    return `concat(extract(dow from ${field}), ':', to_char(${field}, 'HH24'))`;
+  }
+
+  if (db === MYSQL) {
+    return `date_format(${field}, '%w:%H')`;
   }
 }
 
@@ -198,6 +213,11 @@ async function parseFilters(
 }
 
 async function rawQuery(sql: string, data: object): Promise<any> {
+  if (process.env.LOG_QUERY) {
+    log('QUERY:\n', sql);
+    log('PARAMETERS:\n', data);
+  }
+
   const db = getDatabaseType();
   const params = [];
 
@@ -237,6 +257,32 @@ async function pagedQuery<T>(model: string, criteria: T, pageParams: PageParams)
   });
 
   const count = await prisma.client[model].count({ where: (criteria as any).where });
+
+  return { data, count, page: +page, pageSize: size, orderBy };
+}
+
+async function pagedRawQuery(
+  query: string,
+  queryParams: { [key: string]: any },
+  pageParams: PageParams = {},
+) {
+  const { page = 1, pageSize, orderBy, sortDescending = false } = pageParams;
+  const size = +pageSize || DEFAULT_PAGE_SIZE;
+  const offset = +size * (page - 1);
+  const direction = sortDescending ? 'desc' : 'asc';
+
+  const statements = [
+    orderBy && `order by ${orderBy} ${direction}`,
+    +size > 0 && `limit ${+size} offset ${offset}`,
+  ]
+    .filter(n => n)
+    .join('\n');
+
+  const count = await rawQuery(`select count(*) as num from (${query}) t`, queryParams).then(
+    res => res[0].num,
+  );
+
+  const data = await rawQuery(`${query}${statements}`, queryParams);
 
   return { data, count, page: +page, pageSize: size, orderBy };
 }
@@ -284,12 +330,14 @@ export default {
   getCastColumnQuery,
   getDayDiffQuery,
   getDateSQL,
+  getDateWeeklySQL,
   getFilterQuery,
   getSearchParameters,
   getTimestampDiffSQL,
   getSearchSQL,
   getQueryMode,
   pagedQuery,
+  pagedRawQuery,
   parseFilters,
   rawQuery,
 };

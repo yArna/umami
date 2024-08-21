@@ -12,10 +12,10 @@ export function SessionActivity({
 }: {
   websiteId: string;
   sessionId: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
 }) {
-  const { formatDate } = useTimezone();
+  const { formatTimezoneDate } = useTimezone();
   const { data, isLoading } = useSessionActivity(websiteId, sessionId, startDate, endDate);
 
   if (isLoading) {
@@ -33,16 +33,16 @@ export function SessionActivity({
         return (
           <>
             {showHeader && (
-              <div className={styles.header}>{formatDate(createdAt, 'EEEE, PPP')}</div>
+              <div className={styles.header}>{formatTimezoneDate(createdAt, 'EEEE, PPP')}</div>
             )}
             <div key={eventId} className={styles.row}>
               <div className={styles.time}>
                 <StatusLight color={`#${visitId?.substring(0, 6)}`}>
-                  {formatDate(createdAt, 'h:mm:ss aaa')}
+                  {formatTimezoneDate(createdAt, 'h:mm:ss aaa')}
                 </StatusLight>
               </div>
               <Icon>{eventName ? <Icons.Bolt /> : <Icons.Eye />}</Icon>
-              <div>{eventName || urlPath}</div>
+              <div className={styles.value}>{eventName || urlPath}</div>
             </div>
           </>
         );

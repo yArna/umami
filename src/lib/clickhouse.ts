@@ -1,5 +1,5 @@
 import { ClickHouseClient, createClient } from '@clickhouse/client';
-import dateFormat from 'dateformat';
+import { formatInTimeZone } from 'date-fns-tz';
 import debug from 'debug';
 import { CLICKHOUSE } from 'lib/db';
 import { DEFAULT_PAGE_SIZE, OPERATORS } from './constants';
@@ -9,6 +9,7 @@ import { filtersToArray } from './params';
 import { PageParams, QueryFilters, QueryOptions } from './types';
 
 export const CLICKHOUSE_DATE_FORMATS = {
+  utc: '%Y-%m-%dT%H:%i:%SZ',
   second: '%Y-%m-%d %H:%i:%S',
   minute: '%Y-%m-%d %H:%i:00',
   hour: '%Y-%m-%d %H:00:00',
@@ -48,7 +49,11 @@ function getClient() {
   return client;
 }
 
-function getDateStringSQL(data: any, unit: string | number, timezone?: string) {
+function getUTCString(date?: Date | string | number) {
+  return formatInTimeZone(date || new Date(), 'UTC', 'yyyy-MM-dd HH:mm:ss');
+}
+
+function getDateStringSQL(data: any, unit: string = 'utc', timezone?: string) {
   if (timezone) {
     return `formatDateTime(${data}, '${CLICKHOUSE_DATE_FORMATS[unit]}', '${timezone}')`;
   }
@@ -61,10 +66,6 @@ function getDateSQL(field: string, unit: string, timezone?: string) {
     return `date_trunc('${unit}', ${field}, '${timezone}')`;
   }
   return `date_trunc('${unit}', ${field})`;
-}
-
-function getDateFormat(date: Date) {
-  return `'${dateFormat(date, 'UTC:yyyy-mm-dd HH:MM:ss')}'`;
 }
 
 function mapFilter(column: string, operator: string, name: string, type: string = 'String') {
@@ -186,9 +187,13 @@ async function rawQuery<T = unknown>(
     query: query,
     query_params: params,
     format: 'JSONEachRow',
+    clickhouse_settings: {
+      date_time_output_format: 'iso',
+      output_format_json_quote_64bit_integers: 0,
+    },
   });
 
-  return resultSet.json() as T;
+  return (await resultSet.json()) as T;
 }
 
 async function insert(table: string, values: any[]) {
@@ -224,8 +229,8 @@ export default {
   connect,
   getDateStringSQL,
   getDateSQL,
-  getDateFormat,
   getFilterQuery,
+  getUTCString,
   parseFilters,
   pagedQuery,
   findUnique,

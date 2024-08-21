@@ -80,9 +80,9 @@ async function clickhouseQuery(data: {
 }) {
   const { websiteId, sessionId, sessionData } = data;
 
-  const { insert } = clickhouse;
-  const { getDateFormat, sendMessages } = kafka;
-  const createdAt = getDateFormat(new Date());
+  const { insert, getUTCString } = clickhouse;
+  const { sendMessages } = kafka;
+  const createdAt = getUTCString();
 
   const jsonKeys = flattenJSON(sessionData);
 
@@ -94,7 +94,7 @@ async function clickhouseQuery(data: {
       data_type: dataType,
       string_value: getStringValue(value, dataType),
       number_value: dataType === DATA_TYPE.number ? value : null,
-      date_value: dataType === DATA_TYPE.date ? getDateFormat(value) : null,
+      date_value: dataType === DATA_TYPE.date ? getUTCString(value) : null,
       created_at: createdAt,
     };
   });
