@@ -12,11 +12,11 @@ import { filtersToArray } from './params';
 const log = debug('umami:prisma');
 
 const MYSQL_DATE_FORMATS = {
-  minute: '%Y-%m-%d %H:%i:00',
-  hour: '%Y-%m-%d %H:00:00',
-  day: '%Y-%m-%d',
-  month: '%Y-%m-01',
-  year: '%Y-01-01',
+  minute: '%Y-%m-%dT%H:%i:00Z',
+  hour: '%Y-%m-%dT%H:00:00Z',
+  day: '%Y-%m-%dT00:00:00Z',
+  month: '%Y-%m-01T00:00:00Z',
+  year: '%Y-01-01T00:00:00Z',
 };
 
 const POSTGRESQL_DATE_FORMATS = {
@@ -76,10 +76,8 @@ function getDateSQL(field: string, unit: string, timezone?: string): string {
   if (db === MYSQL) {
     if (timezone) {
       const tz = moment.tz(timezone).format('Z');
-
       return `date_format(convert_tz(${field},'+00:00','${tz}'), '${MYSQL_DATE_FORMATS[unit]}')`;
     }
-
     return `date_format(${field}, '${MYSQL_DATE_FORMATS[unit]}')`;
   }
 }
